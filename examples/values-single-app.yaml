@@ -1,0 +1,54 @@
+image:
+  repository: myregistry/tethysapp-example
+  tag: "1.0.0"
+  pullPolicy: Always
+
+tethys:
+  mode: single
+  standaloneApp: example_app
+  publicProtocol: https
+  env:
+    ENABLE_OPEN_PORTAL:
+      value: "True"
+
+externalDatabase:
+  host: postgres.internal
+  name: tethys_platform
+  username: tethys_default
+
+secrets:
+  existingSecretName: example-app-secrets
+  secretEnv:
+    - name: HYDROSHARE_CLIENT_ID
+      key: HYDROSHARE_CLIENT_ID
+    - name: HYDROSHARE_SECRET_ID
+      key: HYDROSHARE_SECRET_ID
+
+serviceAccount:
+  create: true
+  roleArn: arn:aws:iam::000000000000:role/example-app-irsa
+
+ingress:
+  enabled: true
+  className: alb
+  host: example-app.example.org
+  annotations:
+    alb.ingress.kubernetes.io/group.name: shared-portal
+    alb.ingress.kubernetes.io/scheme: internet-facing
+
+s3Static:
+  enabled: true
+  bucket: example-portal-assets
+  region: us-east-1
+
+portalConfig:
+  settings:
+    AUTHENTICATION_BACKENDS:
+      - tethys_services.backends.hydroshare.HydroShareOAuth2
+
+pdb:
+  enabled: true
+hpa:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5

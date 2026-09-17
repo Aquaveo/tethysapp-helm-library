@@ -1,0 +1,11 @@
+{{ include "tethys-app.fullname" . }} deployed.
+
+Mode: {{ .Values.tethys.mode }}{{ with .Values.tethys.standaloneApp }} (app: {{ . }}){{ end }}
+{{- if .Values.ingress.enabled }}
+URL: {{ .Values.tethys.publicProtocol }}://{{ .Values.ingress.host }}/
+{{- else }}
+Service: {{ include "tethys-app.fullname" . }}:{{ .Values.service.port }} (no ingress)
+{{- end }}
+
+Provisioning runs as a pre-upgrade hook Job. Check: kubectl logs job/{{ include "tethys-app.fullname" . }}-provision
+See the chart README for required secret keys and values.

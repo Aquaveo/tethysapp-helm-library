@@ -1,0 +1,61 @@
+{{- if .Values.provision.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "tethys-app.fullname" . }}-provision-config
+  labels:
+    {{- include "tethys-app.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: post-install,pre-upgrade
+    helm.sh/hook-weight: "0"
+    helm.sh/hook-delete-policy: before-hook-creation
+data:
+  portal_config.yml: |
+{{ include "tethys-app.portalConfigContent" . | indent 4 }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "tethys-app.fullname" . }}-provision
+  labels:
+    {{- include "tethys-app.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: post-install,pre-upgrade
+    helm.sh/hook-weight: "1"
+    helm.sh/hook-delete-policy: before-hook-creation
+spec:
+  backoffLimit: {{ .Values.provision.backoffLimit }}
+  ttlSecondsAfterFinished: 600
+  template:
+    spec:
+      restartPolicy: OnFailure
+      serviceAccountName: {{ include "tethys-app.serviceAccountName" . }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      initContainers:
+        - name: wait-for-db
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - until nc -z {{ include "tethys-app.dbHost" . }} {{ include "tethys-app.dbPort" . }}; do echo waiting for db; sleep 2; done
+      containers:
+        - name: provision
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/usr/local/bin/provision.sh"]
+          env:
+            {{- include "tethys-app.env" . | nindent 12 }}
+          volumeMounts:
+            - name: portal-config
+              mountPath: /config
+              readOnly: true
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: portal-config
+          configMap:
+            name: {{ include "tethys-app.fullname" . }}-provision-config
+{{- end }}

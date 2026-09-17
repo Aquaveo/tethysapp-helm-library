@@ -32,6 +32,8 @@ tethys:
   # single = one app at root (MULTIPLE_APP_MODE off); multi = app library
   mode: single
   standaloneApp: ''
+  # public scheme for CSRF trusted origins
+  publicProtocol: https
   # extra portal env, as name: {value|valueFrom}
   env: {}
   volumes: []
@@ -65,6 +67,8 @@ secrets:
   existingSecretName: ''
   create: false
   data: {}
+  # extra env from the secret, as [{name, key, optional}]
+  secretEnv: []
 
 serviceAccount:
   create: true
