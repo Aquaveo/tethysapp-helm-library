@@ -21,15 +21,6 @@ spec:
     - host: {{ .Values.ingress.host | quote }}
       http:
         paths:
-          {{- if .Values.ingress.staticRedirect.enabled }}
-          - path: {{ .Values.ingress.staticRedirect.path }}
-            pathType: Prefix
-            backend:
-              service:
-                name: {{ include "tethys-app.fullname" . }}
-                port:
-                  number: {{ .Values.service.port }}
-          {{- end }}
           - path: /
             pathType: Prefix
             backend:

@@ -42,7 +42,13 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
 {{- define "tethys-app.secretName" -}}
-{{- default (printf "%s-secrets" (include "tethys-app.fullname" .)) .Values.secrets.existingSecretName -}}
+{{- if .Values.secrets.existingSecretName -}}
+{{- .Values.secrets.existingSecretName -}}
+{{- else if .Values.secrets.create -}}
+{{- printf "%s-secrets" (include "tethys-app.fullname" .) -}}
+{{- else -}}
+{{- fail "secrets: set existingSecretName or create=true (needs TETHYS_SECRET_KEY, TETHYS_DB_PASSWORD)" -}}
+{{- end -}}
 {{- end -}}
 
 {{- define "tethys-app.daskName" -}}
@@ -129,7 +135,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
     secretKeyRef:
       name: {{ include "tethys-app.secretName" $ }}
       key: {{ .key }}
-      optional: {{ .optional | default true }}
+      optional: {{ dig "optional" true . }}
 {{- end }}
 {{- range $k, $v := .Values.tethys.env }}
 - name: {{ $k }}

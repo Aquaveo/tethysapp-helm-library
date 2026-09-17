@@ -5,7 +5,7 @@ Generic Helm chart to deploy a [Tethys Platform](https://www.tethysplatform.org/
 ## What it deploys
 
 - A Tethys `Deployment` + `Service`, config-as-code via a mounted `portal_config.yml` ConfigMap.
-- A once-per-release provisioning `Job` (Helm pre-upgrade hook) that waits for the DB, then migrates, collects static, and syncs stores. It runs regardless of replica count, so scaling never races migrations.
+- A once-per-release provisioning `Job` (Helm post-install/pre-upgrade hook) that waits for the DB, then migrates, collects static, and syncs stores. It runs regardless of replica count, so scaling never races migrations.
 - Optional `Ingress`, `ServiceAccount` (IRSA), `PodDisruptionBudget`, `HorizontalPodAutoscaler`, and a created `Secret`.
 - Optional bundled `postgresql` and `valkey` subcharts for standalone installs.
 
@@ -50,7 +50,7 @@ Set `externalDatabase.host` (default) to use an existing Postgres, or `postgresq
 
 ## Static / media
 
-`s3Static.enabled: true` with a `bucket` serves static and media from object storage (SigV4 presigning). Otherwise Tethys serves them from the persist volume.
+`s3Static.enabled: true` with a `bucket` serves static and media from object storage. URLs are unsigned/public (`querystring_auth: false`), so the objects must be publicly readable or fronted by a CDN. Otherwise Tethys serves them from the persist volume.
 
 ## Single-app vs portal
 

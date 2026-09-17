@@ -17,7 +17,6 @@ postgresql:
   auth:
     username: tethys_default
     database: tethys_platform
-    existingSecret: ''
   primary:
     persistence:
       size: 5Gi
@@ -25,8 +24,6 @@ postgresql:
 # Bundled Valkey/Redis for channels; disable to use an external one
 valkey:
   enabled: false
-  auth:
-    enabled: false
 
 tethys:
   # single = one app at root (MULTIPLE_APP_MODE off); multi = app library
@@ -60,7 +57,6 @@ externalDatabase:
   port: 5432
   name: tethys_platform
   username: tethys_default
-  superuser: tethys_default
 
 # secrets Tethys needs: SECRET_KEY, DB passwords, OAuth; provide or let the chart create
 secrets:
@@ -87,11 +83,6 @@ ingress:
   annotations: {}
   host: ''
   tls: []
-  # redirect /static to an object-store host at the LB (ALB only)
-  staticRedirect:
-    enabled: false
-    host: ''
-    path: /static
 
 # object-store static serving in production
 s3Static:
