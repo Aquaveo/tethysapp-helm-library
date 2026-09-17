@@ -1,0 +1,20 @@
+apiVersion: v2
+name: tethys-app
+description: Generic Helm chart to deploy a Tethys Platform app, standalone or in a portal.
+type: application
+version: 0.1.0
+appVersion: '0.1.0'
+keywords:
+  - tethys
+  - tethys-platform
+  - geospatial
+home: https://www.tethysplatform.org/
+dependencies:
+  - name: postgresql
+    version: '16.*'
+    repository: oci://registry-1.docker.io/bitnamicharts
+    condition: postgresql.enabled
+  - name: valkey
+    version: '0.10.0'
+    repository: oci://ghcr.io/valkey-io/valkey-helm
+    condition: valkey.enabled

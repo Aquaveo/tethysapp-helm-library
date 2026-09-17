@@ -1,0 +1,3 @@
+charts/tethys-app/charts/
+charts/tethys-app/Chart.lock
+*.tgz

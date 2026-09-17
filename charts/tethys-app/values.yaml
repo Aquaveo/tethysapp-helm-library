@@ -1,0 +1,136 @@
+nameOverride: ''
+fullnameOverride: ''
+
+replicaCount: 1
+strategy: Recreate
+
+# tethys-uvx-based app image (serves on container port 8080)
+image:
+  repository: ''
+  tag: latest
+  pullPolicy: IfNotPresent
+imagePullSecrets: []
+
+# Bundled Postgres for standalone installs; disable to use externalDatabase
+postgresql:
+  enabled: false
+  auth:
+    username: tethys_default
+    database: tethys_platform
+    existingSecret: ''
+  primary:
+    persistence:
+      size: 5Gi
+
+# Bundled Valkey/Redis for channels; disable to use an external one
+valkey:
+  enabled: false
+  auth:
+    enabled: false
+
+tethys:
+  # single = one app at root (MULTIPLE_APP_MODE off); multi = app library
+  mode: single
+  standaloneApp: ''
+  # extra portal env, as name: {value|valueFrom}
+  env: {}
+  volumes: []
+  volumeMounts: []
+  initContainers:
+    waitForDb: true
+  # per-pod writable workspace for app compute/cache
+  persist:
+    enabled: true
+    mountPath: /home/tethys/persist
+
+# rendered into portal_config.yml settings
+portalConfig:
+  settings:
+    DEBUG: false
+    INSTALLED_APPS: []
+    AUTHENTICATION_BACKENDS: []
+    OAUTH_CONFIG: {}
+  siteSettings: {}
+
+# external Postgres when postgresql.enabled is false
+externalDatabase:
+  host: ''
+  port: 5432
+  name: tethys_platform
+  username: tethys_default
+  superuser: tethys_default
+
+# secrets Tethys needs: SECRET_KEY, DB passwords, OAuth; provide or let the chart create
+secrets:
+  existingSecretName: ''
+  create: false
+  data: {}
+
+serviceAccount:
+  create: true
+  name: ''
+  roleArn: ''
+  annotations: {}
+
+service:
+  type: ClusterIP
+  port: 8080
+  annotations: {}
+
+ingress:
+  enabled: false
+  className: ''
+  annotations: {}
+  host: ''
+  tls: []
+  # redirect /static to an object-store host at the LB (ALB only)
+  staticRedirect:
+    enabled: false
+    host: ''
+    path: /static
+
+# object-store static serving in production
+s3Static:
+  enabled: false
+  bucket: ''
+  region: us-east-1
+  endpointUrl: ''
+
+# one pre-upgrade hook Job: migrate + services + static + syncstores
+provision:
+  enabled: true
+  backoffLimit: 1
+
+resources:
+  requests:
+    cpu: '1'
+    memory: 2Gi
+    ephemeral-storage: 3Gi
+  limits:
+    memory: 4Gi
+    ephemeral-storage: 6Gi
+
+ephemeralStorage:
+  className: ''
+  size: 10Gi
+
+podAnnotations: {}
+podSecurityContext:
+  fsGroup: 1000
+  runAsUser: 1000
+  runAsGroup: 1000
+securityContext: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+pdb:
+  enabled: false
+  maxUnavailable: 1
+
+hpa:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 75
+  targetMemoryUtilizationPercentage: 80
