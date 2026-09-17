@@ -14,7 +14,8 @@ helm install my-app charts/tethys-app -f my-values.yaml
 
 See each chart's README for values and examples. Charts target the `tethys-uvx` image for flexibility and scale-out (single fixed serving port, idempotent provisioning decoupled from replicas).
 
+Compute add-ons like a Dask cluster are left to the consuming app, since not every app needs them; the app's `serviceAccount` (IRSA) is reused by those resources.
+
 ## Roadmap
 
-- Optional Dask block (DaskCluster + autoscaler + IRSA) for compute-heavy apps.
 - Gateway API routing as an alternative to Ingress.
