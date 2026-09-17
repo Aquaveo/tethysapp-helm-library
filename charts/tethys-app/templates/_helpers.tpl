@@ -45,6 +45,21 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- default (printf "%s-secrets" (include "tethys-app.fullname" .)) .Values.secrets.existingSecretName -}}
 {{- end -}}
 
+{{- define "tethys-app.daskName" -}}
+{{- printf "%s-dask" (include "tethys-app.fullname" .) -}}
+{{- end -}}
+
+{{/* dask image defaults to the app image so workers carry the app code */}}
+{{- define "tethys-app.daskImage" -}}
+{{- $repo := .Values.dask.image.repository | default .Values.image.repository -}}
+{{- $tag := .Values.dask.image.tag | default .Values.image.tag -}}
+{{- printf "%s:%s" $repo $tag -}}
+{{- end -}}
+
+{{- define "tethys-app.daskSchedulerAddress" -}}
+{{- printf "tcp://%s-scheduler.%s.svc.cluster.local:8786" (include "tethys-app.daskName" .) .Release.Namespace -}}
+{{- end -}}
+
 {{/* database connection, from a bundled subchart or an external server */}}
 {{- define "tethys-app.dbHost" -}}
 {{- if .Values.postgresql.enabled -}}

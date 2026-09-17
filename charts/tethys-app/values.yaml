@@ -105,6 +105,32 @@ provision:
   enabled: true
   backoffLimit: 1
 
+# optional Dask cluster (needs the dask-kubernetes operator) for compute-heavy apps
+dask:
+  enabled: false
+  # scheduler/worker image; empty uses the app image (workers need the app code)
+  image:
+    repository: ''
+    tag: ''
+  scheduler:
+    resources:
+      requests: { cpu: 500m, memory: 1Gi }
+      limits: { memory: 2Gi }
+  worker:
+    command: /opt/conda/envs/tethys/bin/dask-worker
+    schedulerCommand: /opt/conda/envs/tethys/bin/dask-scheduler
+    nthreads: 2
+    memoryLimit: 12GiB
+    scratchSize: 20Gi
+    nodeSelector: {}
+    env: {}
+    resources:
+      requests: { cpu: '2', memory: 12Gi, ephemeral-storage: 20Gi }
+      limits: { memory: 14Gi, ephemeral-storage: 40Gi }
+  autoscaler:
+    minimum: 0
+    maximum: 4
+
 resources:
   requests:
     cpu: '1'
