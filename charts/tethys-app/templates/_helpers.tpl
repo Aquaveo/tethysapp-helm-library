@@ -82,6 +82,8 @@ app.kubernetes.io/instance: {{ .Release.Name }}
   value: {{ include "tethys-app.dbName" . | quote }}
 - name: TETHYS_DB_USERNAME
   value: {{ include "tethys-app.dbUser" . | quote }}
+- name: PORT
+  value: {{ .Values.service.port | quote }}
 - name: TETHYS_SECRET_KEY
   valueFrom:
     secretKeyRef:
