@@ -98,14 +98,6 @@ app.kubernetes.io/instance: {{ .Release.Name }}
   value: "--production --overwrite"
 - name: INIT_VERSION
   value: {{ .Values.image.tag | quote }}
-{{- if eq .Values.tethys.mode "single" }}
-- name: MULTIPLE_APP_MODE
-  value: "False"
-{{- with .Values.tethys.standaloneApp }}
-- name: STANDALONE_APP
-  value: {{ . | quote }}
-{{- end }}
-{{- end }}
 {{- if .Values.s3Static.enabled }}
 - name: STATIC_S3_BUCKET
   value: {{ .Values.s3Static.bucket | quote }}
@@ -138,6 +130,12 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{/* portal_config settings derived from other chart values */}}
 {{- define "tethys-app.portalConfigDerived" -}}
 {{- $persist := .Values.tethys.persist.mountPath -}}
+{{- if eq .Values.tethys.mode "single" }}
+MULTIPLE_APP_MODE: false
+{{- with .Values.tethys.standaloneApp }}
+STANDALONE_APP: {{ . }}
+{{- end }}
+{{- end }}
 ALLOWED_HOSTS:
   - localhost
   - 127.0.0.1
