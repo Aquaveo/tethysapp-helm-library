@@ -1,0 +1,26 @@
+{{- if .Values.scaleToZero.enabled -}}
+{{- $hosts := .Values.scaleToZero.hosts }}
+{{- if and (not $hosts) .Values.ingress.host }}{{- $hosts = list .Values.ingress.host }}{{- end }}
+{{- if not $hosts }}{{- fail "scaleToZero: set scaleToZero.hosts (or ingress.host) so the KEDA interceptor can match traffic" }}{{- end }}
+{{- if .Values.hpa.enabled }}{{- fail "scaleToZero and hpa are mutually exclusive; enable only one" }}{{- end }}
+apiVersion: http.keda.sh/v1alpha1
+kind: HTTPScaledObject
+metadata:
+  name: {{ include "tethys-app.fullname" . }}
+  labels:
+    {{- include "tethys-app.labels" . | nindent 4 }}
+spec:
+  hosts:
+    {{- range $hosts }}
+    - {{ . | quote }}
+    {{- end }}
+  scaleTargetRef:
+    name: {{ include "tethys-app.fullname" . }}
+    service: {{ include "tethys-app.fullname" . }}
+    port: {{ .Values.service.port }}
+  replicas:
+    min: {{ .Values.scaleToZero.minReplicas }}
+    max: {{ .Values.scaleToZero.maxReplicas }}
+  scaledownPeriod: {{ .Values.scaleToZero.scaledownPeriod }}
+  targetPendingRequests: {{ .Values.scaleToZero.targetPendingRequests }}
+{{- end }}

@@ -129,3 +129,14 @@ hpa:
   maxReplicas: 3
   targetCPUUtilizationPercentage: 75
   targetMemoryUtilizationPercentage: 80
+
+# Optional KEDA HTTP scale-to-zero (needs the KEDA HTTP add-on in the cluster).
+# App scales to 0 when idle and 0->1 on the first request through the interceptor.
+# Mutually exclusive with hpa.
+scaleToZero:
+  enabled: false
+  minReplicas: 0
+  maxReplicas: 3
+  scaledownPeriod: 300
+  hosts: []
+  targetPendingRequests: 100
