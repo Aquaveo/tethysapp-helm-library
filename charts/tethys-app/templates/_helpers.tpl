@@ -136,15 +136,21 @@ MULTIPLE_APP_MODE: false
 STANDALONE_APP: {{ . }}
 {{- end }}
 {{- end }}
+{{- $publicHosts := list }}
+{{- with .Values.ingress.host }}{{- $publicHosts = append $publicHosts . }}{{- end }}
+{{- if .Values.scaleToZero.enabled }}{{- range .Values.scaleToZero.hosts }}{{- $publicHosts = append $publicHosts . }}{{- end }}{{- end }}
+{{- $publicHosts = $publicHosts | uniq }}
 ALLOWED_HOSTS:
   - localhost
   - 127.0.0.1
-{{- with .Values.ingress.host }}
+{{- range $publicHosts }}
   - {{ . }}
 {{- end }}
-{{- with .Values.ingress.host }}
+{{- if $publicHosts }}
 CSRF_TRUSTED_ORIGINS:
+{{- range $publicHosts }}
   - {{ $.Values.tethys.publicProtocol }}://{{ . }}
+{{- end }}
 {{- end }}
 SECURE_PROXY_SSL_HEADER:
   - HTTP_X_FORWARDED_PROTO
