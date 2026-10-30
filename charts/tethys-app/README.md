@@ -12,7 +12,7 @@ Generic Helm chart to deploy a [Tethys Platform](https://www.tethysplatform.org/
 ## Quick start
 
 ```bash
-helm install my-app oci://ghcr.io/aquaveo/charts/tethys-app --version 0.1.0 -f my-values.yaml
+helm install my-app oci://ghcr.io/aquaveo/charts/tethys-app --version 0.1.5 -f my-values.yaml
 ```
 
 From a local checkout instead:
