@@ -11,7 +11,7 @@ Reusable Helm charts for deploying [Tethys Platform](https://www.tethysplatform.
 Install straight from the GHCR OCI registry (pinned to a version):
 
 ```bash
-helm install my-app oci://ghcr.io/aquaveo/charts/tethys-app --version 0.1.0 -f my-values.yaml
+helm install my-app oci://ghcr.io/aquaveo/charts/tethys-app --version 0.1.5 -f my-values.yaml
 ```
 
 Or as a dependency in a consuming chart:
@@ -19,7 +19,7 @@ Or as a dependency in a consuming chart:
 ```yaml
 dependencies:
   - name: tethys-app
-    version: 0.1.0
+    version: 0.1.5
     repository: oci://ghcr.io/aquaveo/charts
 ```
 
